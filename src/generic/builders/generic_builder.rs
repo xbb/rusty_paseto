@@ -112,7 +112,11 @@ impl<'a, 'b, Version, Purpose> GenericBuilder<'a, 'b, Version, Purpose> {
 
     for claim in claims.into_values() {
       let raw = serde_json::to_string(&claim)?;
-      let trimmed = raw.trim_start_matches('{').trim_end_matches('}');
+      let trimmed = if raw.starts_with('{') && raw.ends_with('}') {
+        raw[1..raw.len() - 1].as_ref()
+      } else {
+        raw.as_str()
+      };
       let _ = write!(payload, "{},", trimmed);
     }
 
